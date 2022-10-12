@@ -5,6 +5,7 @@ import styled from "styled-components";
 export default function Modal(props: {
   message: string;
   show: (a: boolean) => void;
+  redirect: string;
 }) {
   const navigate = useNavigate();
   return (
@@ -20,10 +21,10 @@ export default function Modal(props: {
         <ConfirmBtn
           onClick={() => {
             props.show(false);
-            navigate("/");
+            navigate(props.redirect);
           }}
         >
-          로그인페이지로 이동
+          확인
         </ConfirmBtn>
       </PopupBox>
     </>
