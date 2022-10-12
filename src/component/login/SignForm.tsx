@@ -1,43 +1,87 @@
 import React, { useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import axios from "../../api/axios";
 
-const emailReg = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+const EMAIL_REG = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+const LOGIN_URL = "/auth/signin";
+const SIGNUP_URL = "/auth/signup";
 
 export default function SignForm(props: { state: string }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [pw, setPw] = useState("");
+  const [password, setpassword] = useState("");
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify({ email, password })
+      );
+      const accessToken = response?.data?.access_token;
+      sessionStorage.setItem("token", accessToken);
+      navigate("/todo");
+    } catch {
+      console.log("Login failed");
+    }
+  };
+
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        SIGNUP_URL,
+        JSON.stringify({ email, password })
+      );
+      const accessToken = response?.data?.access_token;
+      if (accessToken) {
+        console.log("회원가입이 완료되었습니다");
+        navigate("/login");
+      }
+    } catch {
+      console.log("Signup failed");
+    }
+  };
+
   return (
-    <form method="post">
-      <InputBox>
-        <label>이메일</label>
-        <div>
+    <Wrapper>
+      <form onSubmit={props.state === "로그인" ? handleLogin : handleSignup}>
+        <InputBox>
+          <label>이메일</label>
           <InputField
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-        </div>
-      </InputBox>
-      <InputBox>
-        <label>비밀번호</label>
-        <div>
+        </InputBox>
+        <InputBox>
+          <label>비밀번호</label>
           <InputField
             type="password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value.trim())}
+            value={password}
+            onChange={(e) => setpassword(e.target.value.trim())}
           />
-        </div>
-      </InputBox>
-
-      <ButtonSt
-        type="submit"
-        disabled={!(emailReg.test(email) && pw.length >= 8)}
-      >
-        {props.state}
-      </ButtonSt>
-    </form>
+        </InputBox>
+        <ButtonSt
+          type="submit"
+          disabled={!(EMAIL_REG.test(email) && password.length >= 8)}
+        >
+          {props.state}
+        </ButtonSt>
+      </form>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const InputBox = styled.div`
   display: flex;
