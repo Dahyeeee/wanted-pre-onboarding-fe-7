@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "../../api/axios";
+import Modal from "./Modal";
 
 const EMAIL_REG = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 const LOGIN_URL = "/auth/signin";
@@ -11,6 +12,8 @@ export default function SignForm(props: { state: string }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setpassword] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [msg, setMsg] = useState("");
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,7 +24,7 @@ export default function SignForm(props: { state: string }) {
         JSON.stringify({ email, password })
       );
       const accessToken = response?.data?.access_token;
-      sessionStorage.setItem("token", accessToken);
+      localStorage.setItem("token", accessToken);
       navigate("/todo");
     } catch {
       console.log("Login failed");
@@ -38,8 +41,8 @@ export default function SignForm(props: { state: string }) {
       );
       const accessToken = response?.data?.access_token;
       if (accessToken) {
-        console.log("회원가입이 완료되었습니다");
-        navigate("/login");
+        setMsg("회원가입에 성공하셨습니다.");
+        setShowModal(true);
       }
     } catch {
       console.log("Signup failed");
@@ -72,6 +75,7 @@ export default function SignForm(props: { state: string }) {
           {props.state}
         </ButtonSt>
       </form>
+      {showModal && <Modal message={msg} show={setShowModal} />}
     </Wrapper>
   );
 }
