@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import axios from "../../api/axios";
 
@@ -6,6 +6,11 @@ const TODO_URL = "/todos";
 export default function TodoInput(props: { senseChange: any }) {
   const [todo, setTodo] = useState("");
   const token = localStorage.getItem("token");
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const addTodo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -15,6 +20,7 @@ export default function TodoInput(props: { senseChange: any }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTodo("");
+      inputRef.current?.focus();
       props.senseChange((prev: any) => !prev);
     }
   };
@@ -27,6 +33,7 @@ export default function TodoInput(props: { senseChange: any }) {
           setTodo(e.target.value);
         }}
         value={todo}
+        ref={inputRef}
       ></Input>
       <Button>Add</Button>
     </InputBox>
