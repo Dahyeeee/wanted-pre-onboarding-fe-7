@@ -1,26 +1,22 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "../../api/axios";
-import { Todo } from "../../type/todoItemType";
 
-export default function TodoInput() {
-  const [todoText, setTodoText] = useState("");
+const TODO_URL = "/todos";
+export default function TodoInput(props: { senseChange: any }) {
+  const [todo, setTodo] = useState("");
   const token = localStorage.getItem("token");
 
-  const addTodo = (e: React.FormEvent<HTMLFormElement>) => {
+  const addTodo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newTodo: Todo = {
-      id: 2,
-      todo: todoText,
-      isCompleted: false,
-      userId: 1,
-    };
 
-    axios
-      .post("/todos", JSON.stringify(newTodo), {
+    if (todo) {
+      await axios.post(TODO_URL, JSON.stringify({ todo: todo }), {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => console.log(res));
+      });
+      setTodo("");
+      props.senseChange((prev: any) => !prev);
+    }
   };
 
   return (
@@ -28,8 +24,9 @@ export default function TodoInput() {
       <Input
         type="text"
         onChange={(e) => {
-          setTodoText(e.target.value);
+          setTodo(e.target.value);
         }}
+        value={todo}
       ></Input>
       <Button>Add</Button>
     </InputBox>

@@ -1,17 +1,92 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import axios from "../../api/axios";
 import { Todo } from "../../type/todoItemType";
 
-export default function TodoItem(props: { todoEach: Todo }) {
-  const { id, todo } = props.todoEach;
+interface Text {
+  done: boolean;
+}
+
+export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
+  const token = localStorage.getItem("token");
+  const { id, todo, isCompleted } = props.todoEach;
+  const TODO_URL = `/todos/${id}`;
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [text, setText] = useState(todo);
+
+  const changeState = async () => {
+    await axios.put(
+      TODO_URL,
+      JSON.stringify({ todo: todo, isCompleted: !isCompleted }),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    props.senseChange((prev: any) => !prev);
+  };
+
+  const editText = () => {
+    setIsEditing(true);
+  };
+
+  const deleteItem = async () => {
+    await axios.delete(TODO_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    props.senseChange((prev: any) => !prev);
+  };
+
+  const confirmEdit = async () => {
+    setIsEditing(false);
+    await axios.put(
+      TODO_URL,
+      JSON.stringify({ todo: text, isCompleted: isCompleted }),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    props.senseChange((prev: any) => !prev);
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+  };
 
   return (
     <TodoItemBox id={String(id)}>
-      <li>{todo}</li>
-      <Buttons>
-        <Button>edit</Button>
-        <Button>delete</Button>
-      </Buttons>
+      {isEditing ? (
+        <>
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+            }}
+          />
+          <Buttons>
+            <Button onClick={confirmEdit}>수정</Button>
+            <Button onClick={cancelEdit}>취소</Button>
+          </Buttons>
+        </>
+      ) : (
+        <>
+          <TodoText done={isCompleted} onClick={changeState}>
+            {todo}
+          </TodoText>
+
+          <Buttons>
+            <Button onClick={editText}>수정</Button>
+            <Button onClick={deleteItem}>삭제</Button>
+          </Buttons>
+        </>
+      )}
     </TodoItemBox>
   );
 }
@@ -23,6 +98,13 @@ const TodoItemBox = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+`;
+
+const TodoText = styled.li<Text>`
+  list-style: none;
+  color: ${(props) => (props.done ? "gray" : "black")};
+  text-decoration: ${(props) => (props.done ? "line-through" : "none")};
+  cursor: pointer;
 `;
 
 const Buttons = styled.div`
