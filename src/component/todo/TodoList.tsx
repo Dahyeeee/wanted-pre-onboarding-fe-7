@@ -17,7 +17,6 @@ export default function TodoList(props: { change: boolean; senseChange: any }) {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setTodoList(res.data);
       });
   }, [props.change, token]);

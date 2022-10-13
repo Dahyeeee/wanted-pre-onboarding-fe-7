@@ -77,7 +77,17 @@ export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
         </>
       ) : (
         <>
-          <TodoText done={isCompleted} onClick={changeState}>
+          <input
+            id={String(id)}
+            type="checkbox"
+            onChange={changeState}
+            checked={isCompleted}
+          />
+          <TodoText
+            htmlFor={String(id)}
+            onClick={changeState}
+            done={isCompleted}
+          >
             {todo}
           </TodoText>
 
@@ -91,7 +101,7 @@ export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
   );
 }
 
-const TodoItemBox = styled.div`
+const TodoItemBox = styled.li`
   width: 75%;
   display: flex;
   flex-direction: row;
@@ -100,7 +110,7 @@ const TodoItemBox = styled.div`
   margin-bottom: 1rem;
 `;
 
-const TodoText = styled.li<Text>`
+const TodoText = styled.label<Text>`
   list-style: none;
   color: ${(props) => (props.done ? "gray" : "black")};
   text-decoration: ${(props) => (props.done ? "line-through" : "none")};
