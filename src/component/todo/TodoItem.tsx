@@ -1,63 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import axios from "../../api/axios";
+import { todoApi } from "../../api/todoApi";
 import { Todo } from "../../type/todoItemType";
 
 interface Text {
   done: boolean;
 }
 
-export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
-  const token = localStorage.getItem("token");
+export default function TodoItem(props: { todoEach: Todo }) {
   const { id, todo, isCompleted } = props.todoEach;
-  const TODO_URL = `/todos/${id}`;
 
   const [isEditing, setIsEditing] = useState(false);
-  const [text, setText] = useState(todo);
-
-  const changeState = async () => {
-    await axios.put(
-      TODO_URL,
-      JSON.stringify({ todo: todo, isCompleted: !isCompleted }),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    props.senseChange((prev: any) => !prev);
-  };
-
-  const editText = () => {
-    setIsEditing(true);
-  };
-
-  const deleteItem = async () => {
-    await axios.delete(TODO_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    props.senseChange((prev: any) => !prev);
-  };
-
-  const confirmEdit = async () => {
-    setIsEditing(false);
-    await axios.put(
-      TODO_URL,
-      JSON.stringify({ todo: text, isCompleted: isCompleted }),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    props.senseChange((prev: any) => !prev);
-  };
-
-  const cancelEdit = () => {
-    setIsEditing(false);
-  };
+  const [text, setText] = useState("");
 
   return (
     <TodoItemBox id={String(id)}>
@@ -66,13 +20,27 @@ export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
           <input
             type="text"
             value={text}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setText(e.target.value);
             }}
           />
           <Buttons>
-            <Button onClick={confirmEdit}>수정</Button>
-            <Button onClick={cancelEdit}>취소</Button>
+            <Button
+              onClick={() => {
+                console.log(text);
+                todoApi.editTodoText(id, text, isCompleted);
+                setIsEditing(false);
+              }}
+            >
+              수정
+            </Button>
+            <Button
+              onClick={() => {
+                setIsEditing(false);
+              }}
+            >
+              취소
+            </Button>
           </Buttons>
         </>
       ) : (
@@ -80,20 +48,20 @@ export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
           <input
             id={String(id)}
             type="checkbox"
-            onChange={changeState}
+            onChange={todoApi.editTodoState(id, todo, isCompleted)}
             checked={isCompleted}
           />
           <TodoText
             htmlFor={String(id)}
-            onClick={changeState}
+            onClick={todoApi.editTodoState(id, todo, isCompleted)}
             done={isCompleted}
           >
             {todo}
           </TodoText>
 
           <Buttons>
-            <Button onClick={editText}>수정</Button>
-            <Button onClick={deleteItem}>삭제</Button>
+            <Button onClick={() => setIsEditing(true)}>수정</Button>
+            <Button onClick={todoApi.deleteTodo(id)}>삭제</Button>
           </Buttons>
         </>
       )}

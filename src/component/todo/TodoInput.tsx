@@ -1,39 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import axios from "../../api/axios";
 
-const TODO_URL = "/todos";
-export default function TodoInput(props: { senseChange: any }) {
-  const [todo, setTodo] = useState("");
-  const token = localStorage.getItem("token");
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  const addTodo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (todo) {
-      await axios.post(TODO_URL, JSON.stringify({ todo: todo }), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setTodo("");
-      inputRef.current?.focus();
-      props.senseChange((prev: any) => !prev);
-    }
-  };
+export default function TodoInput(props: { addTodo: any }) {
+  const [text, setText] = useState("");
 
   return (
-    <InputBox onSubmit={addTodo}>
+    <InputBox onSubmit={props.addTodo(text)}>
       <Input
         type="text"
-        onChange={(e) => {
-          setTodo(e.target.value);
+        value={text}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          setText(e.target.value);
         }}
-        value={todo}
-        ref={inputRef}
       ></Input>
       <Button>Add</Button>
     </InputBox>
