@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import axios from "../api/axios";
-import { todoApi } from "../api/todoApi";
+import { todoApi } from "../api/TodoApi";
 import TodoInput from "../component/todo/TodoInput";
 import TodoList from "../component/todo/TodoList";
 
@@ -12,28 +11,23 @@ export default function TodoPage() {
   const [todoList, setTodoList] = useState([]);
 
   useEffect(() => {
-    if (!token) {
+    if (token) {
       navigate("/");
     }
   }, [token, navigate]);
 
   useEffect(() => {
-    axios
-      .get("/todos", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setTodoList(res.data);
-      });
-  }, [setTodoList, token]);
+    todoApi.getTodo().then((res: any) => {
+      console.log(res.data);
+      setTodoList(res.data);
+    });
+  }, [setTodoList, todoApi]);
 
   return (
     <Wrapper>
       <h1>To Do List</h1>
-      <TodoInput addTodo={todoApi.addTodo} />
-      <TodoList todoList={todoList} />
+      <TodoInput onSuccess={setTodoList} />
+      <TodoList todoList={todoList} onSuccess={setTodoList} />
     </Wrapper>
   );
 }

@@ -3,11 +3,15 @@ import styled from "styled-components";
 import { Todo } from "../../type/todoItemType";
 import TodoItem from "./TodoItem";
 
-export default function TodoList(props: { todoList: Todo[] }) {
+export default function TodoList(props: { todoList: Todo[]; onSuccess: any }) {
   return (
     <TodoListWrapper>
       {props.todoList.map((todoEach: Todo) => (
-        <TodoItem key={todoEach.id} todoEach={todoEach} />
+        <TodoItem
+          key={todoEach.id}
+          todoEach={todoEach}
+          onSuccess={props.onSuccess}
+        />
       ))}
     </TodoListWrapper>
   );

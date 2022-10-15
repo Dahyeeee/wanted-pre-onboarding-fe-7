@@ -13,18 +13,18 @@ export const todoApi = {
     return data.data;
   },
 
-  addTodo: (todo: string) => async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  addTodo: async (todo: string) => {
     if (todo) {
-      await axios.post(TODO_URL, JSON.stringify({ todo }), {
+      const data = await axios.post(TODO_URL, JSON.stringify({ todo }), {
         headers: { Authorization: `Bearer ${token}` },
       });
+      return data.data;
     }
   },
 
   editTodoState:
     (id: number, todo: string, isCompleted: boolean) => async () => {
-      await axios.put(
+      const data = await axios.put(
         `${TODO_URL}/${id}`,
         JSON.stringify({ todo, isCompleted: !isCompleted }),
         {
@@ -33,10 +33,11 @@ export const todoApi = {
           },
         }
       );
+      return data.data;
     },
   editTodoText:
     (id: number, todo: string, isCompleted: boolean) => async () => {
-      await axios.put(
+      const data = await axios.put(
         `${TODO_URL}/${id}`,
         JSON.stringify({ todo, isCompleted }),
         {
@@ -45,6 +46,7 @@ export const todoApi = {
           },
         }
       );
+      return data.data;
     },
   deleteTodo: (id: number) => async () => {
     await axios.delete(`${TODO_URL}/${id}`, {

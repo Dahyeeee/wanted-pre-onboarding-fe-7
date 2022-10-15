@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { todoApi } from "../../api/todoApi";
 import { Todo } from "../../type/todoItemType";
@@ -7,7 +7,7 @@ interface Text {
   done: boolean;
 }
 
-export default function TodoItem(props: { todoEach: Todo }) {
+export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
   const { id, todo, isCompleted } = props.todoEach;
 
   const [isEditing, setIsEditing] = useState(false);
@@ -27,9 +27,8 @@ export default function TodoItem(props: { todoEach: Todo }) {
           <Buttons>
             <Button
               onClick={() => {
-                console.log(text);
-                todoApi.editTodoText(id, text, isCompleted);
-                setIsEditing(false);
+                setIsEditing(true);
+                console.log("edited");
               }}
             >
               수정
