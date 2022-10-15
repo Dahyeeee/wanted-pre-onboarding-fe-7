@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { todoApi } from "../api/TodoApi";
+import { todoApi } from "../api/todoApi";
 import TodoInput from "../component/todo/TodoInput";
 import TodoList from "../component/todo/TodoList";
 
@@ -11,17 +11,16 @@ export default function TodoPage() {
   const [todoList, setTodoList] = useState([]);
 
   useEffect(() => {
-    if (token) {
+    if (!token) {
       navigate("/");
     }
   }, [token, navigate]);
 
   useEffect(() => {
-    todoApi.getTodo().then((res: any) => {
-      console.log(res.data);
-      setTodoList(res.data);
+    todoApi.getTodo().then((res) => {
+      setTodoList(res);
     });
-  }, [setTodoList, todoApi]);
+  }, []);
 
   return (
     <Wrapper>

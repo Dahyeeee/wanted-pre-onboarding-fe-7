@@ -11,8 +11,8 @@ export default function TodoInput(props: { onSuccess: any }) {
       onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         todoApi.addTodo(text).then((res) => {
-          console.log(res?.data);
-          props.onSuccess((prev: Todo[]) => prev.push(res?.data));
+          console.log(res);
+          props.onSuccess((prev: Todo[]) => [...prev, res]);
         });
         setText("");
       }}

@@ -5,50 +5,48 @@ const token = localStorage.getItem("token");
 
 export const todoApi = {
   getTodo: async () => {
-    const data = await axios.get(TODO_URL, {
+    const res = await axios.get(TODO_URL, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    return data.data;
+    return res.data;
   },
 
   addTodo: async (todo: string) => {
     if (todo) {
-      const data = await axios.post(TODO_URL, JSON.stringify({ todo }), {
+      const res = await axios.post(TODO_URL, JSON.stringify({ todo }), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return data.data;
+      return res.data;
     }
   },
 
-  editTodoState:
-    (id: number, todo: string, isCompleted: boolean) => async () => {
-      const data = await axios.put(
-        `${TODO_URL}/${id}`,
-        JSON.stringify({ todo, isCompleted: !isCompleted }),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return data.data;
-    },
-  editTodoText:
-    (id: number, todo: string, isCompleted: boolean) => async () => {
-      const data = await axios.put(
-        `${TODO_URL}/${id}`,
-        JSON.stringify({ todo, isCompleted }),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return data.data;
-    },
-  deleteTodo: (id: number) => async () => {
+  editTodoState: async (id: number, todo: string, isCompleted: boolean) => {
+    const res = await axios.put(
+      `${TODO_URL}/${id}`,
+      JSON.stringify({ todo, isCompleted: !isCompleted }),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res;
+  },
+  editTodoText: async (id: number, todo: string, isCompleted: boolean) => {
+    const res = await axios.put(
+      `${TODO_URL}/${id}`,
+      JSON.stringify({ todo, isCompleted }),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res;
+  },
+  deleteTodo: async (id: number) => {
     await axios.delete(`${TODO_URL}/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,

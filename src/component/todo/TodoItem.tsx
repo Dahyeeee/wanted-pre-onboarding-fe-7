@@ -13,6 +13,15 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState("");
 
+  const changeState = async () => {
+    await todoApi.editTodoState(id, todo, isCompleted);
+    props.onSuccess((todoList: Todo[]) =>
+      todoList.map((todo) =>
+        todo.id === id ? { ...todo, isCompleted: !isCompleted } : todo
+      )
+    );
+  };
+
   return (
     <TodoItemBox id={String(id)}>
       {isEditing ? (
@@ -26,9 +35,14 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
           />
           <Buttons>
             <Button
-              onClick={() => {
-                setIsEditing(true);
-                console.log("edited");
+              onClick={async () => {
+                await todoApi.editTodoText(id, text, isCompleted);
+                props.onSuccess((todoList: Todo[]) =>
+                  todoList.map((todo) =>
+                    todo.id === id ? { ...todo, todo: text } : todo
+                  )
+                );
+                setIsEditing(false);
               }}
             >
               수정
@@ -47,12 +61,12 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
           <input
             id={String(id)}
             type="checkbox"
-            onChange={todoApi.editTodoState(id, todo, isCompleted)}
+            onChange={changeState}
             checked={isCompleted}
           />
           <TodoText
             htmlFor={String(id)}
-            onClick={todoApi.editTodoState(id, todo, isCompleted)}
+            onClick={changeState}
             done={isCompleted}
           >
             {todo}
@@ -60,7 +74,16 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
 
           <Buttons>
             <Button onClick={() => setIsEditing(true)}>수정</Button>
-            <Button onClick={todoApi.deleteTodo(id)}>삭제</Button>
+            <Button
+              onClick={async () => {
+                await todoApi.deleteTodo(id);
+                props.onSuccess((todoList: Todo[]) =>
+                  todoList.filter((todo) => todo.id !== id)
+                );
+              }}
+            >
+              삭제
+            </Button>
           </Buttons>
         </>
       )}
