@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import TodoApi from "../api/todoApi";
@@ -6,7 +6,7 @@ import TodoInput from "../component/todo/TodoInput";
 import TodoList from "../component/todo/TodoList";
 
 export default function TodoPage() {
-  const todoApi = new TodoApi();
+  const todoApi = useMemo(() => new TodoApi(), []);
   const navigate = useNavigate();
   const token = todoApi.getToken();
   const [todoList, setTodoList] = useState([]);
