@@ -1,63 +1,17 @@
 import React, { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
-import axios from "../../api/axios";
 import Modal from "./Modal";
 
 const EMAIL_REG = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-const LOGIN_URL = "/auth/signin";
-const SIGNUP_URL = "/auth/signup";
 
-export default function SignForm(props: { state: string }) {
-  const navigate = useNavigate();
+export default function SignForm(props: { state: string; onSubmit: any }) {
   const [email, setEmail] = useState("");
   const [password, setpassword] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [modalMsg, setModalMsg] = useState("");
-  const [path, setPath] = useState("");
-
-  const setModal = useCallback((text: string, path: string) => {
-    setModalMsg(text);
-    setPath(path);
-    setShowModal(true);
-  }, []);
-
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      const response = await axios.post(
-        LOGIN_URL,
-        JSON.stringify({ email, password })
-      );
-      const accessToken = response?.data?.access_token;
-      localStorage.setItem("token", accessToken);
-      navigate("/todo");
-    } catch {
-      setModal("존재하지 않는 이메일이거나 비밀번호가 틀립니다.", "/");
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      const response = await axios.post(
-        SIGNUP_URL,
-        JSON.stringify({ email, password })
-      );
-      const accessToken = response?.data?.access_token;
-      if (accessToken) {
-        setModal("회원가입에 성공하셨습니다.", "/");
-      }
-    } catch {
-      setModal("회원가입에 실패했습니다.", "/signup");
-    }
-  };
 
   return (
     <Wrapper>
-      <form onSubmit={props.state === "로그인" ? handleLogin : handleSignup}>
+      <FormStyle onSubmit={props.onSubmit(email, password)}>
         <InputBox>
           <label>이메일</label>
           <InputField
@@ -80,19 +34,27 @@ export default function SignForm(props: { state: string }) {
         >
           {props.state}
         </ButtonSt>
-      </form>
-      {showModal && (
-        <Modal message={modalMsg} show={setShowModal} redirect={path} />
-      )}
+      </FormStyle>
+      <div>
+        {props.state === "로그인" ? (
+          <Link to={"/signup"}>회원가입하러 가기</Link>
+        ) : (
+          <Link to={"/"}>로그인하러 가기</Link>
+        )}
+      </div>
     </Wrapper>
   );
 }
 
 const Wrapper = styled.div`
-  height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+
+const FormStyle = styled.form`
+  margin-top: 15rem;
 `;
 
 const InputBox = styled.div`
@@ -123,6 +85,7 @@ const ButtonSt = styled.button`
   width: 322px;
   height: 48px;
   font-size: 16px;
+  margin-bottom: 2rem;
   background: #00b992;
   border-radius: 6px;
   border: none;

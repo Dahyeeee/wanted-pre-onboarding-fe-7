@@ -1,20 +1,22 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { todoApi } from "../../api/todoApi";
+import TodoApi from "../../api/todoApi";
 import { Todo } from "../../type/todoItemType";
 
 export default function TodoInput(props: { onSuccess: any }) {
   const [text, setText] = useState("");
+  const todoApi = new TodoApi();
 
   return (
     <InputBox
       onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        todoApi.addTodo(text).then((res) => {
-          console.log(res);
-          props.onSuccess((prev: Todo[]) => [...prev, res]);
-        });
-        setText("");
+        if (text) {
+          todoApi.addTodo(text).then((res) => {
+            props.onSuccess((prev: Todo[]) => [...prev, res]);
+          });
+          setText("");
+        }
       }}
     >
       <Input

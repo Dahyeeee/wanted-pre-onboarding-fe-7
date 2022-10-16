@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { todoApi } from "../../api/todoApi";
+import TodoApi from "../../api/todoApi";
 import { Todo } from "../../type/todoItemType";
 
 interface Text {
@@ -12,6 +12,7 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState("");
+  const todoApi = new TodoApi();
 
   const changeState = async () => {
     await todoApi.editTodoState(id, todo, isCompleted);
