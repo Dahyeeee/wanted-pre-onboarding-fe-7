@@ -1,62 +1,26 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import axios from "../../api/axios";
+import TodoApi from "../../api/todoApi";
 import { Todo } from "../../type/todoItemType";
 
 interface Text {
   done: boolean;
 }
 
-export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
-  const token = localStorage.getItem("token");
+export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
   const { id, todo, isCompleted } = props.todoEach;
-  const TODO_URL = `/todos/${id}`;
 
   const [isEditing, setIsEditing] = useState(false);
-  const [text, setText] = useState(todo);
+  const [text, setText] = useState("");
+  const todoApi = new TodoApi();
 
   const changeState = async () => {
-    await axios.put(
-      TODO_URL,
-      JSON.stringify({ todo: todo, isCompleted: !isCompleted }),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    await todoApi.editTodoState(id, todo, isCompleted);
+    props.onSuccess((todoList: Todo[]) =>
+      todoList.map((todo) =>
+        todo.id === id ? { ...todo, isCompleted: !isCompleted } : todo
+      )
     );
-    props.senseChange((prev: any) => !prev);
-  };
-
-  const editText = () => {
-    setIsEditing(true);
-  };
-
-  const deleteItem = async () => {
-    await axios.delete(TODO_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    props.senseChange((prev: any) => !prev);
-  };
-
-  const confirmEdit = async () => {
-    setIsEditing(false);
-    await axios.put(
-      TODO_URL,
-      JSON.stringify({ todo: text, isCompleted: isCompleted }),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    props.senseChange((prev: any) => !prev);
-  };
-
-  const cancelEdit = () => {
-    setIsEditing(false);
   };
 
   return (
@@ -66,13 +30,31 @@ export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
           <input
             type="text"
             value={text}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setText(e.target.value);
             }}
           />
           <Buttons>
-            <Button onClick={confirmEdit}>수정</Button>
-            <Button onClick={cancelEdit}>취소</Button>
+            <Button
+              onClick={async () => {
+                await todoApi.editTodoText(id, text, isCompleted);
+                props.onSuccess((todoList: Todo[]) =>
+                  todoList.map((todo) =>
+                    todo.id === id ? { ...todo, todo: text } : todo
+                  )
+                );
+                setIsEditing(false);
+              }}
+            >
+              수정
+            </Button>
+            <Button
+              onClick={() => {
+                setIsEditing(false);
+              }}
+            >
+              취소
+            </Button>
           </Buttons>
         </>
       ) : (
@@ -92,8 +74,17 @@ export default function TodoItem(props: { todoEach: Todo; senseChange: any }) {
           </TodoText>
 
           <Buttons>
-            <Button onClick={editText}>수정</Button>
-            <Button onClick={deleteItem}>삭제</Button>
+            <Button onClick={() => setIsEditing(true)}>수정</Button>
+            <Button
+              onClick={async () => {
+                await todoApi.deleteTodo(id);
+                props.onSuccess((todoList: Todo[]) =>
+                  todoList.filter((todo) => todo.id !== id)
+                );
+              }}
+            >
+              삭제
+            </Button>
           </Buttons>
         </>
       )}

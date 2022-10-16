@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 export default function Modal(props: {
-  message: string;
+  info: { message: string; redirect: string };
   show: (a: boolean) => void;
-  redirect: string;
 }) {
   const navigate = useNavigate();
   return (
@@ -17,11 +16,11 @@ export default function Modal(props: {
         }}
       />
       <PopupBox>
-        <p> {props.message}</p>
+        <Message> {props.info.message}</Message>
         <ConfirmBtn
           onClick={() => {
             props.show(false);
-            navigate(props.redirect);
+            navigate(props.info.redirect);
           }}
         >
           확인
@@ -52,6 +51,11 @@ const PopupBox = styled.div`
   background-color: white;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
+  transform: translate(170px, -300px);
+`;
+
+const Message = styled.div`
+  margin: 2rem;
 `;
 
 const ConfirmBtn = styled.button`

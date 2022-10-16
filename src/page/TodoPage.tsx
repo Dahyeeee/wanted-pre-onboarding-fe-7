@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import TodoApi from "../api/todoApi";
 import TodoInput from "../component/todo/TodoInput";
 import TodoList from "../component/todo/TodoList";
 
 export default function TodoPage() {
+  const todoApi = useMemo(() => new TodoApi(), []);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const [change, setChange] = useState(false);
+  const token = todoApi.getToken();
+  const [todoList, setTodoList] = useState([]);
 
   useEffect(() => {
     if (!token) {
@@ -15,11 +17,19 @@ export default function TodoPage() {
     }
   }, [token, navigate]);
 
+  useEffect(() => {
+    if (token) {
+      todoApi.getTodo().then((res) => {
+        setTodoList(res);
+      });
+    }
+  }, [todoApi, token]);
+
   return (
     <Wrapper>
       <h1>To Do List</h1>
-      <TodoInput senseChange={setChange} />
-      <TodoList change={change} senseChange={setChange} />
+      <TodoInput onSuccess={setTodoList} />
+      <TodoList todoList={todoList} onSuccess={setTodoList} />
     </Wrapper>
   );
 }

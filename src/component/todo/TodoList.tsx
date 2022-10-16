@@ -1,33 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import axios from "../../api/axios";
 import { Todo } from "../../type/todoItemType";
 import TodoItem from "./TodoItem";
 
-const TODO_URL = "/todos";
-export default function TodoList(props: { change: boolean; senseChange: any }) {
-  const token = localStorage.getItem("token");
-  const [todoList, setTodoList] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get(TODO_URL, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setTodoList(res.data);
-      });
-  }, [props.change, token]);
-
+export default function TodoList(props: { todoList: Todo[]; onSuccess: any }) {
   return (
     <TodoListWrapper>
-      {todoList.map((todoEach: Todo) => (
+      {props.todoList.map((todoEach: Todo) => (
         <TodoItem
           key={todoEach.id}
           todoEach={todoEach}
-          senseChange={props.senseChange}
+          onSuccess={props.onSuccess}
         />
       ))}
     </TodoListWrapper>
