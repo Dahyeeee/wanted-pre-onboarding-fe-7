@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import TodoApi from "../../api/todoApi";
-import { Todo } from "../../type/todoItemType";
+import { addItem } from "../../utils/todo";
 
 export default function TodoInput(props: { onSuccess: any }) {
   const [text, setText] = useState("");
@@ -13,7 +13,7 @@ export default function TodoInput(props: { onSuccess: any }) {
         e.preventDefault();
         if (text) {
           todoApi.addTodo(text).then((res) => {
-            props.onSuccess((prev: Todo[]) => [...prev, res]);
+            props.onSuccess(addItem(res));
           });
           setText("");
         }

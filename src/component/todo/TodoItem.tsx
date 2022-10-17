@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import TodoApi from "../../api/todoApi";
 import { Todo } from "../../type/todoItemType";
+import { deleteItem, editItemState, editItemText } from "../../utils/todo";
 
 interface Text {
   done: boolean;
@@ -16,11 +17,7 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
 
   const changeState = async () => {
     await todoApi.editTodoState(id, todo, isCompleted);
-    props.onSuccess((todoList: Todo[]) =>
-      todoList.map((todo) =>
-        todo.id === id ? { ...todo, isCompleted: !isCompleted } : todo
-      )
-    );
+    props.onSuccess(editItemState(id, isCompleted));
   };
 
   return (
@@ -38,11 +35,7 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
             <Button
               onClick={async () => {
                 await todoApi.editTodoText(id, text, isCompleted);
-                props.onSuccess((todoList: Todo[]) =>
-                  todoList.map((todo) =>
-                    todo.id === id ? { ...todo, todo: text } : todo
-                  )
-                );
+                props.onSuccess(editItemText(id, text));
                 setIsEditing(false);
               }}
             >
@@ -78,9 +71,7 @@ export default function TodoItem(props: { todoEach: Todo; onSuccess: any }) {
             <Button
               onClick={async () => {
                 await todoApi.deleteTodo(id);
-                props.onSuccess((todoList: Todo[]) =>
-                  todoList.filter((todo) => todo.id !== id)
-                );
+                props.onSuccess(deleteItem(id));
               }}
             >
               삭제
